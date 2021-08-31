@@ -1,4 +1,5 @@
 import math
+import sys
 
 '''
 Main method.
@@ -10,9 +11,13 @@ if __name__ == '__main__':
              ['', '', '']
              ]
 
-    human = 'X'  # player
+    human = 'O'  # player
     machine = 'O' if human == 'X' else 'X' # depends on what human is
     currentPlayer = human
+    
+    if human == machine:
+        print("Human and Computer need to be different players. Choose 'X' or 'O' for the player and the computer")
+        sys.exit()
         
     # first move of computer is totally random
     #board[int(random(3))][int(random(3))] = machine
@@ -82,7 +87,7 @@ def updateTurnMessage():
     # show who's next
     textSize(25)
     fill(250)
-    text("Player's turn:  " + currentPlayer, 30, 20 + boardHeight + (1.0/5) * (canvasHeight - (20 + boardHeight)))    # update text
+    text("Player: " + currentPlayer, 30, 20 + boardHeight + (1.0/5) * (canvasHeight - (20 + boardHeight)))    # update text
 
 '''
 Returns defined value of clicked cell.
@@ -127,8 +132,8 @@ Computes best possible score for the computer to play.
 '''
 def minimax(board, depth, isMaximizing):
     winner = getWinner()
-    if winner != None: # if there is a winner
-        scores = {'X':-1, 'O':1, 'Draw':0}
+    if winner != None: # if there is a winners
+        scores = {human:-1, machine:1, 'Draw':0}  # values for possible outcomes
         return scores[winner[0]]
     
     bestScore = -float('inf') if isMaximizing else float('inf')

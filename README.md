@@ -19,7 +19,7 @@ TicTacToe-Spiel, bei dem der Spieler gegen den Computer antritt (https://www.spi
 Diese Variationen werden in einer Baumstruktur aufgeführt.
 Der Spieler bezweckt eine Maximierung seiner Auswahl in seinem Zug und eine Minimierung im Spielzug des Computers.
 
-<p float='center'>
+<p align='center'>
     <img src="https://user-images.githubusercontent.com/73491052/132740269-4c19a718-c04c-4cf4-92a5-14dc71765a16.png" width=360>
 </p>
 

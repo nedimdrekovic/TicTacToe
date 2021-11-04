@@ -11,20 +11,15 @@ if __name__ == '__main__':
              ['', '', '']
              ]
 
-    human = 'O'  # player
+    human = 'X'  # player
     machine = 'O' if human == 'X' else 'X' # depends on what human is
-    currentPlayer = human
     
     if human == machine:
         print("Human and Computer need to be different players. Choose 'X' or 'O' for the player and the computer")
         sys.exit()
-        
-    # first move of computer is totally random
-    #board[int(random(3))][int(random(3))] = machine
 
-    canvasWidth, canvasHeight = 1000, 800
-    
-    boardWidth = 500
+    canvasWidth, canvasHeight = 800, 600
+    boardWidth = 300
     boardHeight = boardWidth
     circleRadiusWidth = (1.0/3)*boardWidth * 0.7    # 0.7, da Kreis knapp kleiner sein soll wie das Kästchen
     circleRadiusHeight = (1.0/3)*boardHeight * 0.7    # 0.7, da Kreis knapp kleiner sein soll wie das Kästchen
@@ -61,17 +56,13 @@ def setup():
 
     stroke(255)
     # horizontal lines
-    line((canvasWidth - boardWidth) / 2.0, 20 + (0.0/3)*boardHeight, ((canvasWidth - boardWidth) / 2.0) + boardWidth, 20 + (0.0/3)*boardHeight)
-    line((canvasWidth - boardWidth) / 2.0, 20 + (1.0/3)*boardHeight, ((canvasWidth - boardWidth) / 2.0) + boardWidth, 20 + (1.0/3)*boardHeight)
-    line((canvasWidth - boardWidth) / 2.0, 20 + (2.0/3)*boardHeight, ((canvasWidth - boardWidth) / 2.0) + boardWidth, 20 + (2.0/3)*boardHeight)
-    line((canvasWidth - boardWidth) / 2.0, 20 + (3.0/3)*boardHeight, ((canvasWidth - boardWidth) / 2.0) + boardWidth, 20 + (3.0/3)*boardHeight)
-    
+    for i in range(4):
+        line((canvasWidth - boardWidth) / 2.0, 20 + (i/3.0)*boardHeight, ((canvasWidth - boardWidth) / 2.0) + boardWidth, 20 + (i/3.0)*boardHeight)
+
     # vertical lines
-    line((canvasWidth - boardWidth) / 2.0 + (0.0/3)*boardWidth, 20, (canvasWidth - boardWidth) / 2.0 + (0.0/3)*boardWidth, 20 + boardHeight)
-    line((canvasWidth - boardWidth) / 2.0 + (1.0/3)*boardWidth, 20, (canvasWidth - boardWidth) / 2.0 + (1.0/3)*boardWidth, 20 + boardHeight)
-    line((canvasWidth - boardWidth) / 2.0 + (2.0/3)*boardWidth, 20, (canvasWidth - boardWidth) / 2.0 + (2.0/3)*boardWidth, 20 + boardHeight)
-    line((canvasWidth - boardWidth) / 2.0 + (3.0/3)*boardWidth, 20, (canvasWidth - boardWidth) / 2.0 + (3.0/3)*boardWidth, 20 + boardHeight)
-    
+    for i in range(4):
+        line((canvasWidth - boardWidth) / 2.0 + (i/3.0)*boardWidth, 20, (canvasWidth - boardWidth) / 2.0 + (i/3.0)*boardWidth, 20 + boardHeight)
+
     # show message who's next
     updateTurnMessage()
 
@@ -87,7 +78,7 @@ def updateTurnMessage():
     # show who's next
     textSize(25)
     fill(250)
-    text("Player: " + currentPlayer, 30, 20 + boardHeight + (1.0/5) * (canvasHeight - (20 + boardHeight)))    # update text
+    text("You are Player: " + human, 30, 20 + boardHeight + (1.0/5) * (canvasHeight - (20 + boardHeight)))    # update text
 
 '''
 Returns defined value of clicked cell.
@@ -101,6 +92,7 @@ def getCellCoords(x, y):
         tempX = 1
     elif distance + (2.0/3)*boardWidth <= x <= distance + (3.0/3)*boardWidth:
         tempX = 2
+
     if 20 <= y <= 20 + (1.0/3)*boardHeight:
         tempY = 0
     elif 20 + (1.0/3)*boardHeight <= y <= 20 + (2.0/3)*boardHeight:
@@ -110,8 +102,7 @@ def getCellCoords(x, y):
     return tempX, tempY
 
 def bestMove():
-    # folgenden Code lieber in eine Methode schreiben um Überblick zu erhalten
-    # computer
+    # machine
     bestScore = -1 * float('inf')
     bestMove = [0, 0]
     for i in range(3):
@@ -122,10 +113,8 @@ def bestMove():
                 board[j][i] = '' # undo board
                 if score > bestScore:
                     bestScore = score
-                    bestMove = [j, i] # bzw. [j, i] vllt.??
-    board[bestMove[0]][bestMove[1]] = machine
-    currentPlayer = human    
-
+                    bestMove = [j, i]
+    return bestMove[0], bestMove[1]
 
 '''
 Computes best possible score for the computer to play.
@@ -173,75 +162,60 @@ Check if a winner exists
 Draw winner message when game is finished.
 '''
 def checkWinner(winner):
-    global currentPlayer
     fill(255)
     textSize(50)
     if winner[0] == 'Draw':
         text("Draw", 0.425 * canvasWidth, 20 + boardHeight + 0.5 * (canvasHeight - boardHeight))
     else:
-        text("Winner:"+winner[0], 0.425 * canvasWidth, 20 + boardHeight + 0.5 * (canvasHeight - (20 + boardHeight)))
+        text("Winner: "+winner[0], 0.425 * canvasWidth, 20 + boardHeight + 0.5 * (canvasHeight - (20 + boardHeight)))
         highlightWinner(winner[1], winner[2], winner[3])
-    currentPlayer = "-"
     print("Game is over")
 
+'''
+Handles drawing of current player.
+'''
+def drawCurrentPlayer(player, x, y):
+    if player == 'X':
+        stroke(0, 0, 255)   # set color of 'X'
+        strokeWeight(6)
+        line(distance + (1.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (1.0/15)*boardHeight+(boardHeight/3.0)*y, distance + (4.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (4.0/15)*boardHeight+(boardHeight/3.0)*y) # '\'
+        line(distance + (4.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (1.0/15)*boardHeight+(boardHeight/3.0)*y, distance + (1.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (4.0/15)*boardHeight+(boardHeight/3.0)*y) # '/'
+    else:
+        stroke(255, 0, 0)   # set color of 'O'
+        fill(backgroundColorValue)   # fill ellipse        
+        ellipse(distance + (1.0/6)*boardWidth+(1/3.0)*boardWidth*x, 20 + (1/6.0)*boardHeight+(1/3.0)*boardHeight*y, circleRadiusWidth, circleRadiusHeight)                        
 
 '''
 Method is called when mouse is pressed somewhere in the canvas.
 '''
 def mousePressed():
-    global currentPlayer, board
+    global board
 
     x, y = getCellCoords(mouseX, mouseY)
-
     if (x == -1) or (y == -1):
         print("Bitte ein noch nicht belegtes Feld anklicken.")
         return
     if board[y][x] == '': # if field is available
-        board[y][x] = human # human
-        currentPlayer = machine  # now its 'O''s turn
-
-        # draw 'X'
-        stroke(0, 0, 255)   # set color of 'X'
-        strokeWeight(6)
-        line(distance + (1.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (1.0/15)*boardHeight+(boardHeight/3.0)*y, distance + (4.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (4.0/15)*boardHeight+(boardHeight/3.0)*y) # '\'
-        line(distance + (4.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (1.0/15)*boardHeight+(boardHeight/3.0)*y, distance + (1.0/15)*boardWidth+(boardWidth/3.0)*x, 20 + (4.0/15)*boardHeight+(boardHeight/3.0)*y) # '/'
+        drawCurrentPlayer(human, x, y)  # draws player
+        
+        board[y][x] = human # insert value in board
 
         # check if there is a winner and draw winner message
         winner = getWinner()
         if winner != None: # if there is a winner
-            checkWinner(winner)        
-            updateTurnMessage()
+            checkWinner(winner)
             return
-            
-        # insert machine in the spot where the it has the highest winning chance
-        bestScore = -1 * float('inf')
-        bestMove = [0, 0]
-        for i in range(3):
-            for j in range(3):
-                if board[j][i] == '':
-                    board[j][i] = machine
-                    score = minimax(board, 0, False) # compute minimax algorithm
-                    board[j][i] = '' # undo board
-                    if score > bestScore:
-                        bestScore = score
-                        bestMove = [j, i] # bzw. [j, i] vllt.??
-        board[bestMove[0]][bestMove[1]] = machine
-        currentPlayer = human
 
-        # draw 'O'
-        stroke(255, 0, 0)   # set color of 'O'
-        fill(backgroundColorValue)   # fill ellipse
-        ellipse(distance + (1.0/6)*boardWidth+(1/3.0)*boardWidth*bestMove[1], 20 + (1/6.0)*boardHeight+(1/3.0)*boardHeight*bestMove[0], circleRadiusWidth, circleRadiusHeight)                        
-                    
-        # check if there is a winner and draw winner message
-        winner = getWinner()
-        if winner != None: # if there is a winner
-            checkWinner(winner)        
-            updateTurnMessage()
-            return
-    
-        # udpate message
-        updateTurnMessage()
+    # get coords of best move for AI
+    bestMoveX, bestMoveY = bestMove()
+    board[bestMoveX][bestMoveY] = machine
+
+    drawCurrentPlayer(machine, bestMoveY, bestMoveX)  # draws machine
+
+    # check if there is a winner and draw winner message
+    winner = getWinner()
+    if winner != None: # if there is a winner
+        checkWinner(winner)    
 
 '''
 Returns Winner about the end of game if there is one
@@ -254,6 +228,7 @@ def getWinner():
             if equals3(board[i][j], board[i][(j + 1) % 3], board[i][(j + 2) % 3]):
                 return [board[i][j], i, j, "h"]
             elif (equals3(board[i][j], board[(i + 1) % 3][j], board[(i + 2) % 3][j])) :
+                print("Jo:",board[i][j])
                 return [board[i][j], i, j, "v"]
             elif (equals3(board[0][0], board[1][1], board[2][2])) :
                 return [board[0][0], 0, 2, "dv"] #  diagonal vorwaerts
